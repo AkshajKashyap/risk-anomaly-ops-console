@@ -1,3 +1,4 @@
+import { UserButton } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
@@ -15,10 +16,15 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 p-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="text-3xl font-bold">Risk Review Console</h1>
-        <p className="mt-2 text-slate-400">
-          Week 10 skeleton, seeded data, database-connected dashboard
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Risk Review Console</h1>
+            <p className="mt-2 text-slate-400">
+              Week 10 skeleton, seeded data, database-connected dashboard
+            </p>
+          </div>
+          <UserButton />
+        </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
@@ -59,15 +65,9 @@ export default async function DashboardPage() {
                   <td className="px-4 py-3">
                     {event.amount !== null ? `$${event.amount.toFixed(2)}` : "-"}
                   </td>
-                  <td className="px-4 py-3">
-                    {event.flagged ? "Yes" : "No"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {event.riskPrediction?.score ?? "-"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {event.anomalyOutput?.score ?? "-"}
-                  </td>
+                  <td className="px-4 py-3">{event.flagged ? "Yes" : "No"}</td>
+                  <td className="px-4 py-3">{event.riskPrediction?.score ?? "-"}</td>
+                  <td className="px-4 py-3">{event.anomalyOutput?.score ?? "-"}</td>
                 </tr>
               ))}
             </tbody>

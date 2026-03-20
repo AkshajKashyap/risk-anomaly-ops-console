@@ -12,12 +12,24 @@ export default function HomePage() {
           the app shell, database schema, and seeded demo workflow.
         </p>
 
-        <div className="mt-8 flex gap-4">
+        <div className="mt-8 flex gap-4 flex-wrap">
           <Link
             href="/dashboard"
             className="rounded-xl bg-white px-5 py-3 font-medium text-slate-900"
           >
             Open dashboard
+          </Link>
+          <Link
+            href="/sign-in"
+            className="rounded-xl border border-slate-700 px-5 py-3 font-medium text-slate-100"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/sign-up"
+            className="rounded-xl border border-slate-700 px-5 py-3 font-medium text-slate-100"
+          >
+            Sign up
           </Link>
           <Link
             href="/api/health"
