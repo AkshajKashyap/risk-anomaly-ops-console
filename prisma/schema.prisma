@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ESCALATED
+}
+
+enum FeedbackLabelType {
+  TRUE_POSITIVE
+  FALSE_POSITIVE
+  BENIGN
+  NEEDS_MORE_INFO
+}
+
+model User {
+  id          String           @id @default(cuid())
+  clerkUserId String           @unique
+  email       String           @unique
+  name        String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  reviews     ReviewDecision[]
+  labels      FeedbackLabel[]
+}
+
+model EventItem {
+  id              String            @id @default(cuid())
+  externalId      String?           @unique
+  source          String
+  eventType       String
+  amount          Float?
+  country         String?
+  occurredAt      DateTime
+  payload         Json
+  flagged         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  riskPrediction  ModelPrediction?
+  anomalyOutput   AnomalyOutput?
+  reviews         ReviewDecision[]
+  feedbackLabels  FeedbackLabel[]
+}
+
+model ModelPrediction {
+  id           String    @id @default(cuid())
+  eventId      String    @unique
+  modelName    String
+  modelVersion String
+  score        Float
+  confidence   Float?
+  threshold    Float?
+  explanation  Json?
+  latencyMs    Int?
+  createdAt    DateTime  @default(now())
+
+  event        EventItem @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model AnomalyOutput {
+  id           String    @id @default(cuid())
+  eventId      String    @unique
+  modelName    String
+  modelVersion String
+  score        Float
+  threshold    Float?
+  details      Json?
+  latencyMs    Int?
+  createdAt    DateTime  @default(now())
+
+  event        EventItem @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model ReviewDecision {
+  id         String       @id @default(cuid())
+  eventId    String
+  reviewerId String
+  status     ReviewStatus @default(PENDING)
+  note       String?
+  createdAt  DateTime     @default(now())
+
+  event      EventItem    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reviewer   User         @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+}
+
+model FeedbackLabel {
+  id         String            @id @default(cuid())
+  eventId    String
+  reviewerId String
+  label      FeedbackLabelType
+  createdAt  DateTime          @default(now())
+
+  event      EventItem         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reviewer   User              @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+}
