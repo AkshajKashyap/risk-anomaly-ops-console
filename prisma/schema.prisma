@@ -49,6 +49,9 @@ model EventItem {
   anomalyOutput   AnomalyOutput?
   reviews         ReviewDecision[]
   feedbackLabels  FeedbackLabel[]
+
+  @@index([flagged, occurredAt])
+  @@index([source, eventType])
 }
 
 model ModelPrediction {
@@ -64,6 +67,8 @@ model ModelPrediction {
   createdAt    DateTime  @default(now())
 
   event        EventItem @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([score])
 }
 
 model AnomalyOutput {
@@ -78,6 +83,8 @@ model AnomalyOutput {
   createdAt    DateTime  @default(now())
 
   event        EventItem @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([score])
 }
 
 model ReviewDecision {
@@ -87,9 +94,14 @@ model ReviewDecision {
   status     ReviewStatus @default(PENDING)
   note       String?
   createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
   event      EventItem    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   reviewer   User         @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, reviewerId])
+  @@index([status, updatedAt])
+  @@index([reviewerId, updatedAt])
 }
 
 model FeedbackLabel {
@@ -98,7 +110,12 @@ model FeedbackLabel {
   reviewerId String
   label      FeedbackLabelType
   createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 
   event      EventItem         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   reviewer   User              @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, reviewerId])
+  @@index([label, updatedAt])
+  @@index([reviewerId, updatedAt])
 }
