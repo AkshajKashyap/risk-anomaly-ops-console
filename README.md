@@ -20,6 +20,28 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+
+## Analytics KPIs
+
+The `/analytics` page is backed by real database queries and tracks the following Week 13 metrics:
+
+- **Flagged rate**: flagged events / total events
+- **Review completion rate**: reviewed flagged events / flagged events
+- **Average review turnaround time**: average hours from event creation to latest review decision
+- **Decision mix**: percent approved / rejected / escalated among reviewed flagged events
+- **High-risk precision proxy**: among reviewed events whose risk score crossed threshold, percent confirmed by the latest review
+- **Confirmed issue**: latest review status is `APPROVED` or `ESCALATED`
+
+### Review funnel
+
+The analytics funnel tracks:
+
+1. Total events
+2. Flagged
+3. Reviewed
+4. Confirmed issue
+5. Escalated
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

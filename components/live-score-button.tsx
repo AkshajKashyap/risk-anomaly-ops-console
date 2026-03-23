@@ -3,16 +3,27 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-function summarizeResult(data: any) {
+type ScoreServiceResult = {
+  ok?: boolean;
+  score?: number;
+};
+
+type RescoreResponse = {
+  risk?: ScoreServiceResult;
+  anomaly?: ScoreServiceResult;
+  error?: string;
+};
+
+function summarizeResult(data: RescoreResponse) {
   const riskSummary =
-    data?.risk?.ok && typeof data.risk.score === "number"
+    data.risk?.ok && typeof data.risk.score === "number"
       ? `risk ${data.risk.score.toFixed(3)}`
-      : `risk failed`;
+      : "risk failed";
 
   const anomalySummary =
-    data?.anomaly?.ok && typeof data.anomaly.score === "number"
+    data.anomaly?.ok && typeof data.anomaly.score === "number"
       ? `anomaly ${data.anomaly.score.toFixed(3)}`
-      : `anomaly failed`;
+      : "anomaly failed";
 
   return `${riskSummary}, ${anomalySummary}`;
 }
@@ -31,7 +42,7 @@ export function LiveScoreButton({ eventId }: { eventId: string }) {
         method: "POST",
       });
 
-      const data = await response.json();
+      const data: RescoreResponse = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || summarizeResult(data));
