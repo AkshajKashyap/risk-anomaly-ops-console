@@ -1,54 +1,44 @@
-# Architecture Draft
-
-## Week 10 architecture
+# Architecture Diagram
 
 ```mermaid
 flowchart LR
-    U[User in Browser]
-    N[Next.js App Router UI]
-    C[Clerk Auth]
-    A[Next.js Route Handlers]
-    P[Prisma ORM]
-    D[(Postgres)]
-    R[Risk Scoring Service<br/>Week 12]
-    X[Anomaly Detection Service<br/>Week 12]
+    A[Reviewer in browser] --> B[Next.js App Router UI]
+    B --> C[Dashboard]
+    B --> D[Case Detail]
+    B --> E[Analytics]
 
-    U --> N
-    N --> C
-    N --> A
-    A --> P
-    P --> D
-    A -. future .-> R
-    A -. future .-> X
+    C --> F[POST /api/events/ingest-demo]
+    D --> G[POST /api/events/[eventId]/rescore]
+    D --> H[POST /api/reviews]
+    B --> I[GET /api/health]
+
+    F --> J[createAndScoreDemoEvent]
+    G --> K[scoreAndPersistEventById]
+    H --> L[Review upsert + feedback label upsert]
+
+    J --> M[Risk ML service]
+    J --> N[Anomaly ML service]
+    K --> M
+    K --> N
+
+    M --> O[ModelPrediction table]
+    N --> P[AnomalyOutput table]
+
+    J --> Q[EventItem table]
+    K --> Q
+    L --> R[ReviewDecision table]
+    L --> S[FeedbackLabel table]
+
+    E --> T[Analytics query layer]
+    T --> Q
+    T --> O
+    T --> P
+    T --> R
 ```
-
-## Current Scope
-
-- Next.js frontend shell
-- Clerk auth
-- Prisma schema and migrations
-- Postgres database
-- Seeded demo data
-- Database-backed dashboard
-- API health route
-- Vercel deployment
-
-## Current Request Flow
-
-1. User opens the app in the browser.
-2. Clerk handles authentication.
-3. Next.js renders pages and route handlers.
-4. Server code queries Postgres through Prisma.
-5. Seeded events, predictions, and anomaly outputs are returned to the UI.
-
-## Deferred to Later Weeks
-
-- Review actions persisted from UI
-- Detail page for a case
-- ML service integration
-- Analytics page
-- Hardening and polish
 
 ## Notes
 
-Week 10 prioritized shipping speed and a working skeleton over extra features.
+- `EventItem` is the central case record.
+- Risk and anomaly outputs are persisted separately.
+- Reviewer actions and feedback labels are stored independently.
+- The analytics page reads from persisted database state rather than mocked aggregates.

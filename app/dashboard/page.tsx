@@ -13,6 +13,31 @@ type DashboardPageProps = {
   }>;
 };
 
+const allowedStatuses = [
+  "all",
+  "pending",
+  "approved",
+  "rejected",
+  "escalated",
+] as const;
+
+const allowedSortKeys = ["occurredAt", "risk", "anomaly"] as const;
+
+type StatusFilter = (typeof allowedStatuses)[number];
+type SortKey = (typeof allowedSortKeys)[number];
+
+function parseStatusFilter(value?: string): StatusFilter {
+  return allowedStatuses.includes(value as StatusFilter)
+    ? (value as StatusFilter)
+    : "all";
+}
+
+function parseSortKey(value?: string): SortKey {
+  return allowedSortKeys.includes(value as SortKey)
+    ? (value as SortKey)
+    : "occurredAt";
+}
+
 function formatMoney(amount: number | null) {
   if (amount === null) return "-";
   return new Intl.NumberFormat("en-US", {
@@ -30,8 +55,8 @@ function formatDate(value: Date) {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = (await searchParams) ?? {};
-  const statusFilter = params.status ?? "all";
-  const sortBy = params.sort ?? "occurredAt";
+  const statusFilter = parseStatusFilter(params.status);
+  const sortBy = parseSortKey(params.sort);
   const direction = params.direction === "asc" ? "asc" : "desc";
   const flaggedOnly = params.flaggedOnly !== "false";
 
@@ -153,59 +178,72 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </div>
         </div>
 
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900">
-          <table className="min-w-full text-sm">
-            <thead className="border-b border-slate-800 text-left text-slate-400">
-              <tr>
-                <th className="px-4 py-3">External ID</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Source</th>
-                <th className="px-4 py-3">Country</th>
-                <th className="px-4 py-3">Amount</th>
-                <th className="px-4 py-3">Risk</th>
-                <th className="px-4 py-3">Anomaly</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Occurred</th>
-                <th className="px-4 py-3">Open</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((event) => (
-                <tr key={event.id} className="border-b border-slate-800">
-                  <td className="px-4 py-3 font-medium">{event.externalId ?? event.id}</td>
-                  <td className="px-4 py-3">{event.eventType}</td>
-                  <td className="px-4 py-3">{event.source}</td>
-                  <td className="px-4 py-3">{event.country ?? "-"}</td>
-                  <td className="px-4 py-3">{formatMoney(event.amount)}</td>
-                  <td className="px-4 py-3">
-                    {event.riskPrediction?.score?.toFixed(3) ?? "-"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {event.anomalyOutput?.score?.toFixed(3) ?? "-"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={event.latestStatus} />
-                  </td>
-                  <td className="px-4 py-3">{formatDate(event.occurredAt)}</td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/dashboard/events/${event.id}`}
-                      className="rounded-lg border border-slate-700 px-3 py-2"
-                    >
-                      View case
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {rows.length === 0 ? (
+          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 className="text-xl font-semibold">No events matched the current filters</h2>
+            <p className="mt-2 max-w-2xl text-sm text-slate-400">
+              This can happen when the queue is empty or when your status and sort filters narrow the
+              view too aggressively. Reset the filters above or create a fresh demo event.
+            </p>
 
-          {rows.length === 0 ? (
-            <div className="p-6 text-sm text-slate-400">
-              No events matched the current filters.
+            <div className="mt-4">
+              <Link
+                href="/dashboard?status=all&sort=occurredAt&direction=desc"
+                className="rounded-xl border border-slate-700 px-4 py-2 font-medium text-slate-100"
+              >
+                Reset queue filters
+              </Link>
             </div>
-          ) : null}
-        </div>
+          </section>
+        ) : (
+          <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900">
+            <table className="min-w-full text-sm">
+              <thead className="border-b border-slate-800 text-left text-slate-400">
+                <tr>
+                  <th className="px-4 py-3">External ID</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Source</th>
+                  <th className="px-4 py-3">Country</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3">Risk</th>
+                  <th className="px-4 py-3">Anomaly</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Occurred</th>
+                  <th className="px-4 py-3">Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((event) => (
+                  <tr key={event.id} className="border-b border-slate-800">
+                    <td className="px-4 py-3 font-medium">{event.externalId ?? event.id}</td>
+                    <td className="px-4 py-3">{event.eventType}</td>
+                    <td className="px-4 py-3">{event.source}</td>
+                    <td className="px-4 py-3">{event.country ?? "-"}</td>
+                    <td className="px-4 py-3">{formatMoney(event.amount)}</td>
+                    <td className="px-4 py-3">
+                      {event.riskPrediction?.score?.toFixed(3) ?? "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {event.anomalyOutput?.score?.toFixed(3) ?? "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={event.latestStatus} />
+                    </td>
+                    <td className="px-4 py-3">{formatDate(event.occurredAt)}</td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/dashboard/events/${event.id}`}
+                        className="rounded-lg border border-slate-700 px-3 py-2"
+                      >
+                        View case
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </main>
   );
