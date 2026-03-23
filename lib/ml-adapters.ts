@@ -78,8 +78,8 @@ export function buildRiskRequestFromEvent(event: EventForScoring) {
 
 let cachedFeatureColumns: string[] | null = null;
 
-export async function getAnomalyFeatureColumns() {
-  if (cachedFeatureColumns) {
+export async function getAnomalyFeatureColumns(): Promise<string[]> {
+  if (cachedFeatureColumns !== null) {
     return cachedFeatureColumns;
   }
 
@@ -92,8 +92,9 @@ export async function getAnomalyFeatureColumns() {
     );
   }
 
-  cachedFeatureColumns = parsed.feature_columns.map((value: unknown) => String(value));
-  return cachedFeatureColumns;
+  const columns = parsed.feature_columns.map((value: unknown) => String(value));
+  cachedFeatureColumns = columns;
+  return columns;
 }
 
 function deriveFeatureValue(

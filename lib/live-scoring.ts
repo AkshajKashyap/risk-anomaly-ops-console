@@ -14,6 +14,10 @@ export type LiveScoringResult = {
   anomaly: AnomalyInferenceResult;
 };
 
+function toJsonValue(value: unknown) {
+  return JSON.parse(JSON.stringify(value ?? null));
+}
+
 export async function scoreAndPersistEventById(
   eventId: string,
 ): Promise<LiveScoringResult> {
@@ -39,7 +43,7 @@ export async function scoreAndPersistEventById(
         score: risk.score,
         confidence: risk.confidence,
         threshold: risk.threshold,
-        explanation: risk.explanation,
+        explanation: toJsonValue(risk.explanation),
         latencyMs: risk.latencyMs ?? null,
         createdAt: new Date(),
       },
@@ -50,7 +54,7 @@ export async function scoreAndPersistEventById(
         score: risk.score,
         confidence: risk.confidence,
         threshold: risk.threshold,
-        explanation: risk.explanation,
+        explanation: toJsonValue(risk.explanation),
         latencyMs: risk.latencyMs ?? null,
       },
     });
@@ -64,7 +68,7 @@ export async function scoreAndPersistEventById(
         modelVersion: anomaly.modelVersion,
         score: anomaly.score,
         threshold: anomaly.threshold,
-        details: anomaly.details,
+        details: toJsonValue(anomaly.details),
         latencyMs: anomaly.latencyMs ?? null,
         createdAt: new Date(),
       },
@@ -74,7 +78,7 @@ export async function scoreAndPersistEventById(
         modelVersion: anomaly.modelVersion,
         score: anomaly.score,
         threshold: anomaly.threshold,
-        details: anomaly.details,
+        details: toJsonValue(anomaly.details),
         latencyMs: anomaly.latencyMs ?? null,
       },
     });
