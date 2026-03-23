@@ -2,6 +2,7 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/status-badge";
+import { CreateDemoEventButton } from "@/components/create-demo-event-button";
 
 type DashboardPageProps = {
   searchParams?: Promise<{
@@ -77,9 +78,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         );
       }
 
-      return (
-        (a.occurredAt.getTime() - b.occurredAt.getTime()) * multiplier
-      );
+      return (a.occurredAt.getTime() - b.occurredAt.getTime()) * multiplier;
     });
 
   const totalFlagged = events.length;
@@ -93,11 +92,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div>
             <h1 className="text-3xl font-bold">Risk review queue</h1>
             <p className="mt-2 max-w-3xl text-slate-400">
-              Week 11 workflow: filter flagged cases, inspect scores and metadata,
-              and persist reviewer decisions.
+              Week 12 integration: create events, call both local ML services, persist live outputs,
+              and review flagged cases in one workflow.
             </p>
           </div>
-          <UserButton />
+
+          <div className="flex items-start gap-3">
+            <CreateDemoEventButton />
+            <UserButton />
+          </div>
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">

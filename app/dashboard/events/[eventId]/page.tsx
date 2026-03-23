@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/status-badge";
 import { ReviewActionForm } from "@/components/review-action-form";
+import { LiveScoreButton } from "@/components/live-score-button";
 
 type EventDetailPageProps = {
   params: Promise<{
@@ -74,7 +75,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               Case {event.externalId ?? event.id}
             </h1>
             <p className="mt-2 text-slate-400">
-              Inspect model outputs, metadata, and reviewer decisions for this event.
+              Inspect stored outputs, run live scoring, and review this event end to end.
             </p>
           </div>
           <UserButton />
@@ -100,7 +101,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             </p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <p className="text-sm text-slate-400">Status</p>
+            <p className="text-sm text-slate-400">Review status</p>
             <div className="mt-2">
               <StatusBadge status={latestStatus} />
             </div>
@@ -133,6 +134,10 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                   <p className="mt-1">{formatDate(event.occurredAt)}</p>
                 </div>
                 <div>
+                  <p className="text-sm text-slate-400">Flagged state</p>
+                  <p className="mt-1">{event.flagged ? "Flagged" : "Not flagged"}</p>
+                </div>
+                <div>
                   <p className="text-sm text-slate-400">Threshold status</p>
                   <p className="mt-1">{thresholdStatus}</p>
                 </div>
@@ -140,27 +145,64 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             </section>
 
             <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-              <h2 className="text-lg font-semibold">Model details</h2>
+              <h2 className="text-lg font-semibold">Stored model outputs</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-sm text-slate-400">Risk model</p>
-                  <p className="mt-1">
-                    {event.riskPrediction?.modelName ?? "-"} / {event.riskPrediction?.modelVersion ?? "-"}
-                  </p>
+                  <p className="mt-1">{event.riskPrediction?.modelName ?? "-"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-400">Anomaly model</p>
-                  <p className="mt-1">
-                    {event.anomalyOutput?.modelName ?? "-"} / {event.anomalyOutput?.modelVersion ?? "-"}
-                  </p>
+                  <p className="text-sm text-slate-400">Risk version</p>
+                  <p className="mt-1">{event.riskPrediction?.modelVersion ?? "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Risk threshold</p>
                   <p className="mt-1">{event.riskPrediction?.threshold?.toFixed(3) ?? "-"}</p>
                 </div>
                 <div>
+                  <p className="text-sm text-slate-400">Risk scored at</p>
+                  <p className="mt-1">
+                    {event.riskPrediction ? formatDate(event.riskPrediction.createdAt) : "-"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Risk latency</p>
+                  <p className="mt-1">
+                    {event.riskPrediction?.latencyMs !== null &&
+                    event.riskPrediction?.latencyMs !== undefined
+                      ? `${event.riskPrediction.latencyMs} ms`
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="border-t border-slate-800 pt-4 sm:col-span-2" />
+
+                <div>
+                  <p className="text-sm text-slate-400">Anomaly model</p>
+                  <p className="mt-1">{event.anomalyOutput?.modelName ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Anomaly version</p>
+                  <p className="mt-1">{event.anomalyOutput?.modelVersion ?? "-"}</p>
+                </div>
+                <div>
                   <p className="text-sm text-slate-400">Anomaly threshold</p>
                   <p className="mt-1">{event.anomalyOutput?.threshold?.toFixed(3) ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Anomaly scored at</p>
+                  <p className="mt-1">
+                    {event.anomalyOutput ? formatDate(event.anomalyOutput.createdAt) : "-"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Anomaly latency</p>
+                  <p className="mt-1">
+                    {event.anomalyOutput?.latencyMs !== null &&
+                    event.anomalyOutput?.latencyMs !== undefined
+                      ? `${event.anomalyOutput.latencyMs} ms`
+                      : "-"}
+                  </p>
                 </div>
               </div>
             </section>
@@ -174,6 +216,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           </div>
 
           <div className="space-y-6">
+            <LiveScoreButton eventId={event.id} />
             <ReviewActionForm eventId={event.id} />
 
             <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
