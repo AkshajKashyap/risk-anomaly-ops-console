@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Risk Anomaly Ops Console",
-  description: "Week 10 review console skeleton",
+  description: "Fraud and anomaly review console with live scoring and analytics",
 };
 
 export default function RootLayout({

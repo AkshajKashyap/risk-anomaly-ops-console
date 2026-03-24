@@ -1,4 +1,4 @@
-# Week 12 Ship Report
+# Live ML Integration Report
 
 ## Goal
 Integrate both ML services into the ops console so new events can be scored live, persisted, and reviewed in the UI.
@@ -59,4 +59,4 @@ Manual browser flow worked:
 6. returned to dashboard and confirmed event presence
 
 ## Outcome
-Week 12 moved the app from seeded/mock scoring to live multi-service ML integration.
+This milestone moved the app from seeded/mock scoring to live multi-service ML integration.

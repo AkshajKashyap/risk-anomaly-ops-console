@@ -8,8 +8,8 @@ export default function HomePage() {
           Risk Anomaly Ops Console
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-slate-400">
-          Phase 3 fraud and anomaly review console. This Week 10 build proves
-          the app shell, database schema, and seeded demo workflow.
+          Fraud and anomaly review console showcasing the app shell, database
+          schema, and seeded demo workflow.
         </p>
 
         <div className="mt-8 flex gap-4 flex-wrap">

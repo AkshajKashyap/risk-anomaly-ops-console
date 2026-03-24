@@ -117,7 +117,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div>
             <h1 className="text-3xl font-bold">Risk review queue</h1>
             <p className="mt-2 max-w-3xl text-slate-400">
-              Week 12 integration: create events, call both local ML services, persist live outputs,
+              Create events, call both local ML services, persist live outputs,
               and review flagged cases in one workflow.
             </p>
           </div>

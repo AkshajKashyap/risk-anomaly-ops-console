@@ -150,9 +150,9 @@ This is not just a model notebook or dashboard mockup. It shows:
 
 ## Current status
 
-- Week 12: live ML scoring + review workflow
-- Week 13: analytics dashboard
-- Week 14: hardening, docs, demo, deployment polish
+- Live ML scoring and review workflow are implemented
+- The analytics dashboard is live
+- Current focus: hardening, documentation, demo quality, and deployment polish
 
 ## Next steps
 

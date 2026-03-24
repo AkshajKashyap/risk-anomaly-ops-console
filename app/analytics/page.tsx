@@ -26,7 +26,7 @@ export default async function AnalyticsPage() {
             </Link>
             <h1 className="mt-3 text-3xl font-bold">Operations analytics</h1>
             <p className="mt-2 max-w-3xl text-slate-400">
-              Week 13 view of queue health, reviewer throughput, and model-output quality
+              View queue health, reviewer throughput, and model-output quality
               across {summary.totalEvents} total events.
             </p>
           </div>

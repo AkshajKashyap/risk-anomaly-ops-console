@@ -1,4 +1,4 @@
-# Week 13 Ship Report - Analytics Dashboard
+# Analytics Dashboard Report
 
 ## Goal
 Build a real database-backed analytics page for the Risk Anomaly Ops Console that shows reviewer workflow health and model-to-human outcome metrics.
@@ -51,4 +51,4 @@ This makes the project look more like a real internal ops product instead of jus
 Designed and implemented a SQL/Prisma-backed analytics dashboard for a fraud/anomaly review console, including workflow funnel metrics, review turnaround, decision mix, and a human-feedback precision proxy.
 
 ## Next logical step
-Week 14 should focus on deployment polish, demo quality, and resume/portfolio packaging rather than adding more core product surface area.
+The next phase should focus on deployment polish, demo quality, and resume or portfolio packaging rather than adding more core product surface area.
