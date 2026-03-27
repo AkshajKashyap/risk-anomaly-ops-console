@@ -67,6 +67,7 @@ Create `.env.local` with your database, Clerk, and ML service configuration.
 - Clerk auth keys
 - risk service base URL
 - anomaly service base URL
+- optional `ANOMALY_FEATURE_SCHEMA_PATH` override, otherwise the app uses `artifacts/feature_schema.json`
 
 ```bash
 npm run dev

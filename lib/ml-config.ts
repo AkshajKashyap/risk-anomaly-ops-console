@@ -1,3 +1,5 @@
+import path from "node:path";
+
 function requireEnv(name: string, fallback?: string) {
   const value = process.env[name] ?? fallback;
 
@@ -13,7 +15,7 @@ export const mlConfig = {
   anomalyServiceUrl: requireEnv("ANOMALY_SERVICE_URL", "http://127.0.0.1:8002"),
   anomalyFeatureSchemaPath: requireEnv(
     "ANOMALY_FEATURE_SCHEMA_PATH",
-    "/home/akshaj/code/flagship2-log-anomaly/artifacts/feature_schema.json",
+    path.join(process.cwd(), "artifacts", "feature_schema.json"),
   ),
   anomalyModel: process.env.ANOMALY_MODEL ?? "iforest",
   requestTimeoutMs: Number(process.env.ML_REQUEST_TIMEOUT_MS ?? "5000"),
