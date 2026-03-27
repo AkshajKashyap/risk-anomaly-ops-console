@@ -15,57 +15,148 @@ const evaluationSteps = [
   },
 ];
 
+const proofChips = [
+  "Persisted reviewer decisions",
+  "Database-backed analytics",
+  "Live rescoring with stored outputs",
+];
+
+const previewSections = [
+  {
+    eyebrow: "Queue",
+    title: "Flagged review queue",
+    detail: "Filter flagged events by status and sort by occurred time, risk, or anomaly.",
+    items: ["Latest review status", "Stored risk + anomaly scores", "Open case detail"],
+  },
+  {
+    eyebrow: "Case",
+    title: "Case investigation",
+    detail: "Inspect event metadata, prior labels, and reviewer context before taking action.",
+    items: ["Reviewer action form", "Model metadata + thresholds", "Rescore event"],
+  },
+  {
+    eyebrow: "Analytics",
+    title: "Operational KPIs",
+    detail: "Roll the workflow up into queue health, review completion, turnaround, and quality.",
+    items: ["Flagged rate", "Average review turnaround", "High-risk precision proxy"],
+  },
+];
+
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-950 px-8 py-10 text-slate-100">
-      <div className="mx-auto max-w-5xl">
-        <section className="rounded-[2rem] border border-slate-800 bg-slate-900/70 px-8 py-14 shadow-2xl shadow-slate-950/30">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">
-              Risk Anomaly Ops Console
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-              A fraud and anomaly review console for triaging flagged events,
-              recording reviewer decisions, and tracking queue health.
-            </h1>
-            <p className="mt-5 text-base text-slate-300 sm:text-lg">
-              Built to show the product layer around ML scoring: review queue,
-              case investigation, reviewer action, and analytics in one flow.
-            </p>
-            <p className="mt-4 text-sm font-medium text-slate-200 sm:text-base">
-              Queue -&gt; case detail -&gt; reviewer action -&gt; analytics
-            </p>
-          </div>
+    <main className="min-h-screen bg-slate-950 px-6 py-8 text-slate-100 sm:px-8 sm:py-10">
+      <div className="mx-auto max-w-6xl">
+        <section className="rounded-[2rem] border border-slate-800 bg-slate-900/70 px-6 py-8 shadow-2xl shadow-slate-950/30 sm:px-8 sm:py-10 lg:px-10">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">
+                Risk Anomaly Ops Console
+              </p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                Review flagged events, record decisions, and track queue health.
+              </h1>
+              <p className="mt-5 text-base text-slate-300 sm:text-lg">
+                Built to show the product layer around ML scoring: review queue,
+                case investigation, reviewer action, and analytics in one flow.
+              </p>
+              <p className="mt-4 text-sm font-medium text-slate-200 sm:text-base">
+                Queue → case detail → reviewer action → analytics
+              </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/dashboard"
-              className="rounded-xl bg-white px-5 py-3 font-medium text-slate-900 transition hover:bg-slate-200"
-            >
-              Open dashboard
-            </Link>
-            <Link
-              href="/analytics"
-              className="rounded-xl border border-slate-700 px-5 py-3 font-medium text-slate-100 transition hover:border-slate-500 hover:bg-slate-800"
-            >
-              Open analytics
-            </Link>
-            <Link
-              href="/sign-in"
-              className="rounded-xl border border-slate-700 px-5 py-3 font-medium text-slate-100 transition hover:border-slate-500 hover:bg-slate-800"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/api/health"
-              className="rounded-xl border border-slate-700 px-5 py-3 font-medium text-slate-100 transition hover:border-slate-500 hover:bg-slate-800"
-            >
-              Check health
-            </Link>
+              <div className="mt-6 flex flex-wrap gap-2.5">
+                {proofChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-sm text-cyan-100"
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/dashboard"
+                  className="rounded-xl bg-white px-5 py-3 font-medium text-slate-900 transition hover:bg-slate-200"
+                >
+                  Open dashboard
+                </Link>
+                <Link
+                  href="/analytics"
+                  className="rounded-xl border border-slate-700 bg-slate-950/50 px-5 py-3 font-medium text-slate-100 transition hover:border-slate-500 hover:bg-slate-800"
+                >
+                  Open analytics
+                </Link>
+                <Link
+                  href="/sign-in"
+                  className="text-sm font-medium text-slate-400 transition hover:text-slate-200"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/api/health"
+                  className="text-sm font-medium text-slate-500 transition hover:text-slate-300"
+                >
+                  Health
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-4 shadow-inner shadow-slate-950/60">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Product preview
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Queue, case review, and KPI rollups in one workflow
+                  </p>
+                </div>
+                <div className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-cyan-400/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {previewSections.map((section) => (
+                  <div
+                    key={section.title}
+                    className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                      {section.eyebrow}
+                    </p>
+                    <div className="mt-2 flex items-start justify-between gap-3">
+                      <div>
+                        <h2 className="text-base font-semibold text-white">{section.title}</h2>
+                        <p className="mt-1 text-sm leading-6 text-slate-400">
+                          {section.detail}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-slate-700 px-2.5 py-1 text-xs font-medium text-slate-300">
+                        Real app surface
+                      </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {section.items.map((item) => (
+                        <span
+                          key={item}
+                          className="rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1.5 text-xs text-slate-300"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="mt-8 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+        <section className="mt-6 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
               What to evaluate
