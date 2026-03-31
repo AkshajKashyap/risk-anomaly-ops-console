@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { getAnalyticsSnapshot } from "@/lib/analytics";
 import { MetricCard } from "@/components/metric-card";
 import { ReviewFunnelChart } from "@/components/review-funnel-chart";
@@ -13,6 +14,7 @@ function formatHours(value: number) {
 }
 
 export default async function AnalyticsPage() {
+  const { userId } = await auth();
   const snapshot = await getAnalyticsSnapshot();
   const { summary } = snapshot;
 
@@ -38,17 +40,36 @@ export default async function AnalyticsPage() {
             >
               Open review queue
             </Link>
-            <UserButton />
+            {userId ? (
+              <UserButton />
+            ) : (
+              <Link
+                href="/sign-in"
+                className="rounded-xl bg-white px-4 py-2 font-medium text-slate-900"
+              >
+                Sign in to edit
+              </Link>
+            )}
           </div>
         </div>
+
+        {!userId ? (
+          <section className="mt-6 rounded-2xl border border-cyan-400/25 bg-cyan-400/10 p-4">
+            <p className="text-sm font-medium text-cyan-100">Public read-only demo mode</p>
+            <p className="mt-1 max-w-3xl text-sm text-cyan-50/85">
+              Analytics, queue browsing, and case inspection are public for evaluation. Sign in only
+              for write actions like creating demo events, rerunning scoring, or saving reviews.
+            </p>
+          </section>
+        ) : null}
 
         {summary.totalEvents === 0 ? (
           <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <h2 className="text-xl font-semibold">No analytics data yet</h2>
             <p className="mt-2 max-w-2xl text-sm text-slate-400">
               The analytics page becomes useful after at least one event has been created and scored.
-              Go back to the review queue, create a demo event, then return here to inspect KPI cards
-              and the review funnel.
+              Browse the public review queue first. If you need to create a fresh demo event, sign in
+              and use the write actions from the dashboard.
             </p>
 
             <div className="mt-4">

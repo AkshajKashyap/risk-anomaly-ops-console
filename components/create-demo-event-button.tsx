@@ -3,6 +3,28 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+type ScoreServiceResult = {
+  ok?: boolean;
+  error?: string;
+  score?: number;
+};
+
+type CreateDemoEventResponse = {
+  eventId?: string;
+  risk?: ScoreServiceResult;
+  anomaly?: ScoreServiceResult;
+  error?: string;
+};
+
+function scoringOutcome(data: CreateDemoEventResponse) {
+  const riskOk = data.risk?.ok === true;
+  const anomalyOk = data.anomaly?.ok === true;
+
+  if (riskOk && anomalyOk) return "scored";
+  if (riskOk || anomalyOk) return "partial";
+  return "failed";
+}
+
 export function CreateDemoEventButton() {
   const router = useRouter();
   const [running, setRunning] = useState(false);
@@ -17,15 +39,20 @@ export function CreateDemoEventButton() {
         method: "POST",
       });
 
-      const data = await response.json();
+      const data: CreateDemoEventResponse = await response.json();
+
+      if (data.eventId) {
+        const outcome = scoringOutcome(data);
+        router.push(`/dashboard/events/${data.eventId}?created=1&scoring=${outcome}`);
+        router.refresh();
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to create live-scored demo event");
       }
 
       setMessage("Demo event created and scored");
-      router.push(`/dashboard/events/${data.eventId}`);
-      router.refresh();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create demo event";

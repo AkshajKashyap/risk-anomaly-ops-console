@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/status-badge";
 import { CreateDemoEventButton } from "@/components/create-demo-event-button";
@@ -54,6 +55,7 @@ function formatDate(value: Date) {
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const { userId } = await auth();
   const params = (await searchParams) ?? {};
   const statusFilter = parseStatusFilter(params.status);
   const sortBy = parseSortKey(params.sort);
@@ -129,10 +131,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             >
               Open analytics
             </Link>
-            <CreateDemoEventButton />
-            <UserButton />
+            {userId ? <CreateDemoEventButton /> : null}
+            {userId ? (
+              <UserButton />
+            ) : (
+              <Link
+                href="/sign-in"
+                className="rounded-xl bg-white px-4 py-2 font-medium text-slate-900"
+              >
+                Sign in to edit
+              </Link>
+            )}
           </div>
         </div>
+
+        {!userId ? (
+          <section className="mt-6 rounded-2xl border border-cyan-400/25 bg-cyan-400/10 p-4">
+            <p className="text-sm font-medium text-cyan-100">Public read-only demo mode</p>
+            <p className="mt-1 max-w-3xl text-sm text-cyan-50/85">
+              Browse the seeded queue and open any case without signing in. Sign in only if you
+              want to create a live-scored demo event, rerun scoring, or save a reviewer action.
+            </p>
+          </section>
+        ) : null}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">

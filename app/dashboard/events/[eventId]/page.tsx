@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/status-badge";
 import { ReviewActionForm } from "@/components/review-action-form";
@@ -9,6 +10,10 @@ import { LiveScoreButton } from "@/components/live-score-button";
 type EventDetailPageProps = {
   params: Promise<{
     eventId: string;
+  }>;
+  searchParams?: Promise<{
+    created?: string;
+    scoring?: string;
   }>;
 };
 
@@ -27,8 +32,13 @@ function formatDate(value: Date) {
   }).format(value);
 }
 
-export default async function EventDetailPage({ params }: EventDetailPageProps) {
+export default async function EventDetailPage({
+  params,
+  searchParams,
+}: EventDetailPageProps) {
+  const { userId } = await auth();
   const { eventId } = await params;
+  const query = (await searchParams) ?? {};
 
   const event = await prisma.eventItem.findUnique({
     where: { id: eventId },
@@ -57,6 +67,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   const latestReview = event.reviews[0];
   const latestLabel = event.feedbackLabels[0];
   const latestStatus = latestReview?.status ?? "PENDING";
+  const scoringState =
+    query.created === "1" &&
+    (query.scoring === "scored" || query.scoring === "partial" || query.scoring === "failed")
+      ? query.scoring
+      : null;
   const thresholdStatus =
     (event.riskPrediction?.score ?? 0) >= (event.riskPrediction?.threshold ?? 1) ||
     (event.anomalyOutput?.score ?? 0) >= (event.anomalyOutput?.threshold ?? 1)
@@ -78,10 +93,46 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               Inspect stored outputs, run live scoring, and review this event end to end.
             </p>
           </div>
-          <UserButton />
+          {userId ? (
+            <UserButton />
+          ) : (
+            <Link
+              href="/sign-in"
+              className="rounded-xl bg-white px-4 py-2 font-medium text-slate-900"
+            >
+              Sign in to edit
+            </Link>
+          )}
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-4">
+          {scoringState ? (
+            <section
+              className={`md:col-span-4 rounded-2xl border p-4 ${
+                scoringState === "scored"
+                  ? "border-emerald-400/25 bg-emerald-400/10"
+                  : scoringState === "partial"
+                    ? "border-amber-400/25 bg-amber-400/10"
+                    : "border-rose-400/25 bg-rose-400/10"
+              }`}
+            >
+              <p className="text-sm font-medium text-white">
+                {scoringState === "scored"
+                  ? "Demo event created and scored"
+                  : scoringState === "partial"
+                    ? "Demo event created with partial scoring"
+                    : "Demo event created, but live scoring failed"}
+              </p>
+              <p className="mt-1 text-sm text-slate-200">
+                {scoringState === "scored"
+                  ? "Both ML services responded and the latest outputs were saved on this case."
+                  : scoringState === "partial"
+                    ? "The case was created, but only one ML service responded. You can still inspect the event and retry scoring after sign-in."
+                    : "The case was created, but neither ML service responded. This usually means the local scoring services are offline. You can still inspect the event and retry scoring after sign-in."}
+              </p>
+            </section>
+          ) : null}
+
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
             <p className="text-sm text-slate-400">Risk score</p>
             <p className="mt-2 text-2xl font-semibold">
@@ -216,17 +267,40 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           </div>
 
           <div className="space-y-6">
-            <LiveScoreButton eventId={event.id} />
-            <ReviewActionForm eventId={event.id} />
+            {userId ? (
+              <>
+                <LiveScoreButton eventId={event.id} />
+                <ReviewActionForm eventId={event.id} />
+              </>
+            ) : (
+              <section className="rounded-2xl border border-cyan-400/25 bg-cyan-400/10 p-5">
+                <h2 className="text-lg font-semibold text-cyan-50">Read-only demo mode</h2>
+                <p className="mt-1 text-sm text-cyan-50/85">
+                  This case is publicly explorable so evaluators can inspect the workflow without
+                  signing in. Sign in only if you want to rerun live scoring or save a reviewer
+                  decision.
+                </p>
+                <div className="mt-4">
+                  <Link
+                    href="/sign-in"
+                    className="inline-flex rounded-xl bg-white px-4 py-2 font-medium text-slate-900"
+                  >
+                    Sign in for write actions
+                  </Link>
+                </div>
+              </section>
+            )}
 
             <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
               <h2 className="text-lg font-semibold">Latest review</h2>
               {latestReview ? (
                 <div className="mt-4 space-y-3 text-sm">
-                  <div>
-                    <p className="text-slate-400">Reviewer</p>
-                    <p>{latestReview.reviewer.name ?? latestReview.reviewer.email}</p>
-                  </div>
+                  {userId ? (
+                    <div>
+                      <p className="text-slate-400">Reviewer</p>
+                      <p>{latestReview.reviewer.name ?? latestReview.reviewer.email}</p>
+                    </div>
+                  ) : null}
                   <div>
                     <p className="text-slate-400">Decision</p>
                     <div className="mt-1">
@@ -251,10 +325,12 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               <h2 className="text-lg font-semibold">Latest feedback label</h2>
               {latestLabel ? (
                 <div className="mt-4 space-y-3 text-sm">
-                  <div>
-                    <p className="text-slate-400">Reviewer</p>
-                    <p>{latestLabel.reviewer.name ?? latestLabel.reviewer.email}</p>
-                  </div>
+                  {userId ? (
+                    <div>
+                      <p className="text-slate-400">Reviewer</p>
+                      <p>{latestLabel.reviewer.name ?? latestLabel.reviewer.email}</p>
+                    </div>
+                  ) : null}
                   <div>
                     <p className="text-slate-400">Label</p>
                     <p>{latestLabel.label}</p>

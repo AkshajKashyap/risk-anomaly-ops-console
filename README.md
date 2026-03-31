@@ -6,24 +6,58 @@ Core workflow: `queue -> case detail -> reviewer action -> analytics`
 
 This repo is meant to show the product layer around ML scoring, not just model output. It combines a review queue, case investigation view, reviewer decisions, and database-backed analytics in one app.
 
-## What to look at
+## Start Here
 
-- `/dashboard` for the flagged review queue
-- `/dashboard/events/[eventId]` for case detail and reviewer action
-- `/analytics` for queue health and outcome KPIs
+- Start the public demo at `/dashboard`
+- Open one seeded case from the queue
+- Finish at `/analytics` to see queue health and outcome KPIs
 
-## How to evaluate this project
+You can browse the seeded queue, case detail pages, and analytics without signing in.
 
-1. Open the dashboard and scan the flagged queue.
-2. Open a case to inspect stored scores, event metadata, and the latest review state.
-3. Finish in analytics to see how reviewer actions roll up into operational metrics.
+Sign-in is only needed for write actions:
+- create a demo event
+- rerun live scoring
+- save a reviewer decision or feedback label
 
-## What this project demonstrates
+## What This Proves
 
-- End-to-end ML product integration, not just model output
+- End-to-end ML product integration, not just raw model output
 - Human-in-the-loop review workflow with persisted decisions
 - Database-backed analytics tied to queue health and reviewer outcomes
-- Product thinking around case operations, not just dashboards
+- Product thinking around case operations, not just a dashboard shell
+
+## Public vs Auth-Only
+
+- Public read-only: `/dashboard`, `/dashboard/events/[eventId]`, `/analytics`
+- Auth-only writes: `POST /api/events/ingest-demo`, `POST /api/events/[eventId]/rescore`, `POST /api/reviews`
+
+## Live Scoring Caveat
+
+The seeded read-only demo works on its own. Live scoring is a local demo integration and requires two separate ML service repos to be running.
+
+- Risk service: `RISK_SERVICE_URL` in `.env.local` defaults to `http://127.0.0.1:8001`
+- Anomaly service: `ANOMALY_SERVICE_URL` in `.env.local` defaults to `http://127.0.0.1:8002`
+- In local development, each service repo may require activating its own `.venv` before running `uvicorn`
+
+Example local startup:
+
+```bash
+cd /home/akshaj/code/churn-ensemble
+source .venv/bin/activate
+uvicorn src.api:app --reload --host 127.0.0.1 --port 8001
+```
+
+```bash
+cd /home/akshaj/code/flagship2-log-anomaly
+source .venv/bin/activate
+uvicorn api:app --app-dir src --host 127.0.0.1 --port 8002
+```
+
+If those services are offline, the app still supports public read-only evaluation with seeded data, but create/rescore actions will not produce fresh live scores.
+
+## ML Story Note
+
+This project is honest about being a demo integration layer around separate ML services. The ops-console domain is fraud/anomaly review, while the local risk and anomaly backends are adapted service integrations rather than a perfectly domain-native production stack.
 
 ## Core features
 

@@ -3,11 +3,11 @@ import Link from "next/link";
 const evaluationSteps = [
   {
     title: "Review queue",
-    description: "Start on the dashboard to see flagged events, scores, and current review status.",
+    description: "Start the public demo on the dashboard to scan the seeded flagged queue and latest review state.",
   },
   {
     title: "Case detail",
-    description: "Open one case to inspect event metadata, stored model outputs, and reviewer context.",
+    description: "Open one seeded case to inspect event metadata, stored model outputs, and reviewer context.",
   },
   {
     title: "Analytics",
@@ -62,6 +62,10 @@ export default function HomePage() {
               <p className="mt-4 text-sm font-medium text-slate-200 sm:text-base">
                 Queue → case detail → reviewer action → analytics
               </p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">
+                Public demo browsing is available without auth. Sign in only if you want to create
+                demo events, rerun live scoring, or save reviewer decisions.
+              </p>
 
               <div className="mt-6 flex flex-wrap gap-2.5">
                 {proofChips.map((chip) => (
@@ -79,7 +83,7 @@ export default function HomePage() {
                   href="/dashboard"
                   className="rounded-xl bg-white px-5 py-3 font-medium text-slate-900 transition hover:bg-slate-200"
                 >
-                  Open dashboard
+                  Start public demo
                 </Link>
                 <Link
                   href="/analytics"
@@ -89,9 +93,9 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href="/sign-in"
-                  className="text-sm font-medium text-slate-400 transition hover:text-slate-200"
+                  className="text-sm font-medium text-slate-300 transition hover:text-white"
                 >
-                  Sign in
+                  Sign in for write actions
                 </Link>
                 <Link
                   href="/api/health"
@@ -189,6 +193,13 @@ export default function HomePage() {
                 </dd>
               </div>
               <div>
+                <dt className="text-sm font-medium text-slate-300">How to evaluate</dt>
+                <dd className="mt-1 text-sm leading-6 text-slate-400">
+                  Start with the public dashboard, open one case, then finish in analytics. The
+                  strongest path is readable in under two minutes without signing in.
+                </dd>
+              </div>
+              <div>
                 <dt className="text-sm font-medium text-slate-300">Seeded view</dt>
                 <dd className="mt-1 text-sm leading-6 text-slate-400">
                   The repo includes seeded events, model outputs, and reviewer
@@ -196,10 +207,10 @@ export default function HomePage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-slate-300">What stands out</dt>
+                <dt className="text-sm font-medium text-slate-300">Live scoring note</dt>
                 <dd className="mt-1 text-sm leading-6 text-slate-400">
-                  It connects live scoring, human review, and operational KPIs
-                  instead of stopping at a model demo.
+                  Write actions use local demo ML integrations. They work when the two local ML
+                  service repos are running; otherwise the seeded read-only demo still works.
                 </dd>
               </div>
             </dl>
