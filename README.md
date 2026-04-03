@@ -1,30 +1,32 @@
 # Risk Anomaly Ops Console
 
-A fraud and anomaly review console for triaging flagged events, recording reviewer decisions, and tracking queue health.
+A human-in-the-loop ML product case study for fraud and anomaly operations.
 
 Core workflow: `queue -> case detail -> reviewer action -> analytics`
 
-This repo is meant to show the product layer around ML scoring, not just model output. It combines a review queue, case investigation view, reviewer decisions, and database-backed analytics in one app.
+This project focuses on the systems and product layer that turns model outputs into a usable review workflow: triaging flagged events, recording reviewer decisions, triggering rescoring, and tracking operational outcomes.
 
-## Start Here
+## What This Repo Proves
 
-- Start the public demo at `/dashboard`
+- ML predictions can be operationalized into a reviewer-facing workflow, not just surfaced as raw scores
+- flagged events can be turned into reviewable cases with persisted context, decisions, and feedback labels
+- external ML services can be integrated through live rescoring hooks and adapter layers
+- analytics can be tied to operational outcomes and queue health, not just offline model metrics
+
+If you are skimming quickly: this is an internal ops console that demonstrates ML system integration, human review workflows, and operational analytics.
+
+## Demo In 60 Seconds
+
+- Open the public demo and go to `/dashboard`
 - Open one seeded case from the queue
 - Finish at `/analytics` to see queue health and outcome KPIs
 
 You can browse the seeded queue, case detail pages, and analytics without signing in.
 
-Sign-in is only needed for write actions:
+Sign-in is only required for write actions:
 - create a demo event
 - rerun live scoring
 - save a reviewer decision or feedback label
-
-## What This Proves
-
-- End-to-end ML product integration, not just raw model output
-- Human-in-the-loop review workflow with persisted decisions
-- Database-backed analytics tied to queue health and reviewer outcomes
-- Product thinking around case operations, not just a dashboard shell
 
 ## Public vs Auth-Only
 
@@ -55,9 +57,22 @@ uvicorn api:app --app-dir src --host 127.0.0.1 --port 8002
 
 If those services are offline, the app still supports public read-only evaluation with seeded data, but create/rescore actions will not produce fresh live scores.
 
-## ML Story Note
+## ML Integration Approach
 
-This project is honest about being a demo integration layer around separate ML services. The ops-console domain is fraud/anomaly review, while the local risk and anomaly backends are adapted service integrations rather than a perfectly domain-native production stack.
+This repo focuses on the application layer around ML services:
+
+- normalize model outputs into a common case-review workflow
+- persist predictions alongside events and reviewer actions
+- support rescoring and failure handling
+- expose analytics over stored outcomes
+
+The current local ML backends are adapted demo integrations, not a domain-perfect fraud stack. The strongest claim of this repo is that it shows how ML predictions become reviewable cases, persisted decisions, and operational analytics.
+
+## Interview Summary
+
+Short version:
+
+> I built a human-in-the-loop ops console on top of external ML scoring services. The interesting part is how predictions become reviewable cases, persisted decisions, and analytics that reflect operational outcomes.
 
 ## Core features
 
